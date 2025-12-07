@@ -1,29 +1,87 @@
+MAGIC MOD FOR QUAKE II
+======================
 
-This is the complete source code for Quake 2, version 3.19, buildable with
-visual C++ 6.0.  The linux version should be buildable, but we haven't
-tested it for the release.
+A gameplay overhaul where all weapons use a shared mana pool and are converted
+into magical spells. Each spell has unique effects and is stronger against
+certain monsters depending on its elemental affinity.
 
-The code is all licensed under the terms of the GPL (gnu public license).  
-You should read the entire license, but the gist of it is that you can do 
-anything you want with the code, including sell your new version.  The catch 
-is that if you distribute new binary versions, you are required to make the 
-entire source code available for free to everyone.
+-----------------------------------------------------------------------
+WEAPON SPELLS
+-----------------------------------------------------------------------
 
-The primary intent of this release is for entertainment and educational 
-purposes, but the GPL does allow commercial exploitation if you obey the 
-full license.  If you want to do something commercial and you just can't bear 
-to have your source changes released, we could still negotiate a separate 
-license agreement (for $$$), but I would encourage you to just live with the 
-GPL.
+Machine Gun  - Heal Syphon
+    • Heals the player for damage dealt.
 
-All of the Q2 data files remain copyrighted and licensed under the 
-original terms, so you cannot redistribute data from the original game, but if 
-you do a true total conversion, you can create a standalone game based on 
-this code.
+Chaingun  - Wind Staff
+    • Slicing wind that deals heavy knockback.
 
-Thanks to Robert Duffy for doing the grunt work of building this release.
+Rocket Launcher  - Magic Missile
+    • Fires three homing missiles doing a lore accurate 1d4+1 damage each.
 
-John Carmack
-Id Software
+Grenade Launcher / Grenade  - Mana Bomb
+    • Explosion returns mana to the player.
 
+Railgun  - Magic Wall
+    • Fires a stacked wall of beam projectiles.
 
+Shotgun  - Rock Blast
+    • A burst of rocks dealing high damage with low accuracy.
+
+Super Shotgun  - Gust
+    • Pushes all visible enemies away from the player.
+
+BFG10k  - Blood Magic
+    • Consumes player health instead of mana when fired.
+
+Blaster  - Eruption
+    • Creates an explosion and launches enemies upward.
+
+Super Blaster  - Rapid Eruption
+    • Rapid-fire version of Eruption.
+
+-----------------------------------------------------------------------
+UPGRADEABLE SPELL ATTRIBUTES
+-----------------------------------------------------------------------
+
+    • Cost (reduced mana usage)
+    • Effectiveness (damage)
+    • Max Mana
+    • Max Health
+    • Speed
+
+-----------------------------------------------------------------------
+SPELL LIST
+-----------------------------------------------------------------------
+
+    Eruption
+    Rock Blast
+    Gust
+    Heal Syphon
+    Wind Staff
+    Mana Bomb
+    Magic Missile
+    Super Eruption
+    Firewall
+    Blood Magic
+
+-----------------------------------------------------------------------
+ELEMENTAL AFFINITIES
+-----------------------------------------------------------------------
+
+Wind: (Beats Arcane)
+    - Gust
+    - Wind Staff
+
+Darkness: (Beats Earth)
+    - Heal Syphon
+    - Blood Magic
+
+Arcane: (Beats Darkness)
+    - Mana Bomb
+    - Magic Missile
+    - Magic Wall
+
+Earth: (Beats Wind)
+    - Rock Blast
+    - Eruption
+    - Rapid Eruption

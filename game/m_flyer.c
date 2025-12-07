@@ -584,7 +584,7 @@ void SP_monster_flyer (edict_t *self)
 		self->targetname = self->target;
 		self->target = NULL;
 	}
-
+	self->element = 1;
 	sound_sight = gi.soundindex ("flyer/flysght1.wav");
 	sound_idle = gi.soundindex ("flyer/flysrch1.wav");
 	sound_pain1 = gi.soundindex ("flyer/flypain1.wav");

@@ -731,6 +731,7 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int s
 void fire_grenade (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius);
 void fire_grenade2 (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int speed, float timer, float damage_radius, qboolean held);
 void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius, int radius_damage);
+void rocket_think (edict_t* self);
 void fire_rail (edict_t *self, vec3_t start, vec3_t aimdir, int damage, int kick);
 void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, float damage_radius);
 
@@ -851,6 +852,10 @@ typedef struct
 	int			max_grenades;
 	int			max_cells;
 	int			max_slugs;
+
+	// ben added
+	int         mana;
+	int         max_mana;
 
 	gitem_t		*weapon;
 	gitem_t		*lastweapon;
@@ -1050,6 +1055,8 @@ struct edict_s
 	float		damage_debounce_time;
 	float		fly_sound_debounce_time;	//move to clientinfo
 	float		last_move_time;
+	//Ben added
+	int element;
 
 	int			health;
 	int			max_health;
@@ -1090,7 +1097,8 @@ struct edict_s
 	float		wait;
 	float		delay;			// before firing targets
 	float		random;
-
+	//ben added
+	float  deathtime;
 	float		teleport_time;
 
 	int			watertype;

@@ -303,7 +303,7 @@ fire_blaster
 Fires a single blaster bolt.  Used by the blaster and hyper blaster.
 =================
 */
-void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
+void blaster_touch(edict_t* self, edict_t* other, cplane_t* plane, csurface_t* surf)
 {
 	int		mod;
 
@@ -312,7 +312,7 @@ void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *
 
 	if (surf && (surf->flags & SURF_SKY))
 	{
-		G_FreeEdict (self);
+		G_FreeEdict(self);
 		return;
 	}
 
@@ -325,21 +325,24 @@ void blaster_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *
 			mod = MOD_HYPERBLASTER;
 		else
 			mod = MOD_BLASTER;
-		T_Damage (other, self, self->owner, self->velocity, self->s.origin, plane->normal, self->dmg, 1, DAMAGE_ENERGY, mod);
+		T_Damage(other, self, self->owner, self->velocity, self->s.origin, plane->normal, self->dmg, 1, DAMAGE_ENERGY, mod);
 	}
-	else
-	{
-		gi.WriteByte (svc_temp_entity);
-		gi.WriteByte (TE_BLASTER);
-		gi.WritePosition (self->s.origin);
-		if (!plane)
-			gi.WriteDir (vec3_origin);
-		else
-			gi.WriteDir (plane->normal);
-		gi.multicast (self->s.origin, MULTICAST_PVS);
+	//Ben added
+	if (self->spawnflags & 1) {
+		gi.WriteByte(svc_temp_entity);
+		gi.WriteByte(TE_EXPLOSION1);
+		gi.WritePosition(self->s.origin);
+		gi.multicast(self->s.origin, MULTICAST_PVS);
+	}
+	else {
+		gi.WriteByte(svc_temp_entity);
+		gi.WriteByte(TE_EXPLOSION2);
+		gi.WritePosition(self->s.origin);
+		gi.multicast(self->s.origin, MULTICAST_PVS);
 	}
 
-	G_FreeEdict (self);
+
+	G_FreeEdict(self);
 }
 
 void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, int effect, qboolean hyper)
@@ -399,28 +402,25 @@ static void Grenade_Explode (edict_t *ent)
 {
 	vec3_t		origin;
 	int			mod;
+	edict_t*	target = NULL;
+	int 		manaRegen = 50;
 
 	if (ent->owner->client)
 		PlayerNoise(ent->owner, ent->s.origin, PNOISE_IMPACT);
 
-	//FIXME: if we are onground then raise our Z just a bit since we are a point?
-	if (ent->enemy)
+	//ben added: mana recharge
+	while ((target = findradius(target, ent->s.origin, ent->dmg_radius)) != NULL)
 	{
-		float	points;
-		vec3_t	v;
-		vec3_t	dir;
+		if (!target->client)
+			continue;
 
-		VectorAdd (ent->enemy->mins, ent->enemy->maxs, v);
-		VectorMA (ent->enemy->s.origin, 0.5, v, v);
-		VectorSubtract (ent->s.origin, v, v);
-		points = ent->dmg - 0.5 * VectorLength (v);
-		VectorSubtract (ent->enemy->s.origin, ent->s.origin, dir);
-		if (ent->spawnflags & 1)
-			mod = MOD_HANDGRENADE;
-		else
-			mod = MOD_GRENADE;
-		T_Damage (ent->enemy, ent, ent->owner, dir, ent->s.origin, vec3_origin, (int)points, (int)points, DAMAGE_RADIUS, mod);
+		target->client->pers.mana += manaRegen;
+		if (target->client->pers.mana > target->client->pers.max_mana)
+			target->client->pers.mana = target->client->pers.max_mana;
+
+		gi.sound(target, CHAN_ITEM, gi.soundindex("items/bandaid.wav"), 1, ATTN_NORM, 0);
 	}
+	//ben end
 
 	if (ent->spawnflags & 2)
 		mod = MOD_HELD_GRENADE;
@@ -428,7 +428,6 @@ static void Grenade_Explode (edict_t *ent)
 		mod = MOD_HG_SPLASH;
 	else
 		mod = MOD_G_SPLASH;
-	T_RadiusDamage(ent, ent->owner, ent->dmg, ent->enemy, ent->dmg_radius, mod);
 
 	VectorMA (ent->s.origin, -0.02, ent->velocity, origin);
 	gi.WriteByte (svc_temp_entity);
@@ -630,13 +629,17 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	rocket->clipmask = MASK_SHOT;
 	rocket->solid = SOLID_BBOX;
 	rocket->s.effects |= EF_ROCKET;
+	rocket->s.renderfx |= RF_SHELL_RED | RF_SHELL_BLUE;
 	VectorClear (rocket->mins);
 	VectorClear (rocket->maxs);
 	rocket->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
 	rocket->owner = self;
 	rocket->touch = rocket_touch;
-	rocket->nextthink = level.time + 8000/speed;
-	rocket->think = G_FreeEdict;
+	//ben added
+	rocket->nextthink = level.time + 0.1;
+	rocket->think = rocket_think;
+	rocket->deathtime = level.time + 10.0;
+
 	rocket->dmg = damage;
 	rocket->radius_dmg = radius_damage;
 	rocket->dmg_radius = damage_radius;
@@ -647,6 +650,51 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 		check_dodge (self, rocket->s.origin, dir, speed);
 
 	gi.linkentity (rocket);
+}
+
+// Ben added
+void rocket_think(edict_t* self)
+{
+	if (level.time > self->deathtime)
+	{
+		G_FreeEdict(self);
+		return;
+	}
+
+	edict_t* target = NULL;
+	edict_t* closest_enemy = NULL;
+	vec3_t	target_dir;
+	float	distance;
+	float	min_distance = 1024;
+	float   speed_factor = 0.8;
+
+	while ((target = findradius(target, self->s.origin, min_distance)) != NULL)
+	{
+		if (!target->inuse || !target->takedamage || !target->health || target == self->owner)
+			continue;
+
+		if (target->client)
+			continue;
+
+		vec3_t temp_vec;
+		VectorSubtract(target->s.origin, self->s.origin, temp_vec);
+		distance = VectorLength(temp_vec);
+		if (distance < min_distance)
+		{
+			min_distance = distance;
+			closest_enemy = target;
+		}
+	}
+
+	if (closest_enemy)
+	{
+		VectorSubtract(closest_enemy->s.origin, self->s.origin, target_dir);
+		VectorNormalize(target_dir);
+		float current_speed = VectorLength(self->velocity);
+		VectorScale(target_dir, current_speed * speed_factor, self->velocity);
+		vectoangles(self->velocity, self->s.angles);
+	}
+	self->nextthink = level.time + 0.1;
 }
 
 
@@ -891,7 +939,10 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 	bfg->movetype = MOVETYPE_FLYMISSILE;
 	bfg->clipmask = MASK_SHOT;
 	bfg->solid = SOLID_BBOX;
-	bfg->s.effects |= EF_BFG | EF_ANIM_ALLFAST;
+	//bfg->s.effects |= EF_BFG | EF_ANIM_ALLFAST;
+	//ben added
+	bfg->s.effects |= EF_ROCKET | EF_ANIM_ALLFAST;
+	bfg->s.renderfx |= RF_SHELL_RED;
 	VectorClear (bfg->mins);
 	VectorClear (bfg->maxs);
 	bfg->s.modelindex = gi.modelindex ("sprites/s_bfg1.sp2");

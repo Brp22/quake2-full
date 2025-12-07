@@ -401,6 +401,26 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 	}
 	meansOfDeath = mod;
 
+
+	//ben added
+	//machine gun healing
+	if (mod == MOD_MACHINEGUN) {
+		if (attacker->client) {
+			
+			int heal_amount = (int)(damage * 0.5);
+			int max_regen = attacker->client->pers.max_health - attacker->health;
+
+			if (heal_amount > max_regen)
+				heal_amount = max_regen;
+
+			attacker->health += heal_amount;
+
+			gi.sound(attacker, CHAN_ITEM, gi.soundindex("items/pkup.wav"), 1, ATTN_NORM, 0);
+			attacker->client->respawn_time = level.time;
+		}
+	}
+	//ben added end
+
 	// easy mode takes half damage
 	if (skill->value == 0 && deathmatch->value == 0 && targ->client)
 	{
@@ -491,9 +511,63 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		else
 			SpawnDamage (te_sparks, point, normal, take);
 
+		int attack_element = 0;
+		int target_element = 0;
 
+		switch (mod)
+		{
+		case MOD_MACHINEGUN:
+		case MOD_BFG_EFFECT:
+		case MOD_BFG_BLAST:
+		case MOD_BFG_LASER:
+			attack_element = 2;
+			break;
+		case MOD_CHAINGUN:
+		case MOD_SSHOTGUN:
+			attack_element = 1;
+			break;
+		case MOD_GRENADE:
+		case MOD_ROCKET: 
+		case MOD_RAILGUN:
+		case MOD_G_SPLASH:
+			attack_element = 3;
+			break;
+		case MOD_SHOTGUN:
+		case MOD_BLASTER:
+		case MOD_HYPERBLASTER:
+			attack_element = 4;
+			break;
+		default:
+			attack_element = 0;
+		}
+
+		if ((targ->svflags & SVF_MONSTER) && (targ->element >= 1) && (targ->element <= 4))
+		{
+			target_element = targ->element;
+
+			qboolean weakness = false;
+
+			if (attack_element == 1 && target_element == 3) // Wind beats Arcane
+				weakness = true;
+			else if (attack_element == 2 && target_element == 4) // Darkness beats Earth
+				weakness = true;
+			else if (attack_element == 3 && target_element == 2) // Arcane beats Darkness
+				weakness = true;
+			else if (attack_element == 4 && target_element == 1) // Earth beats Wind
+				weakness = true;
+
+			if (weakness)
+			{
+				take *= 2;
+				gi.cprintf(inflictor->owner, PRINT_HIGH, "Elemental Weakness!\n");
+			}
+		}
+
+		if (mod == MOD_BLASTER) {
+			targ->velocity[2] += 400.0;
+		}
 		targ->health = targ->health - take;
-			
+		
 		if (targ->health <= 0)
 		{
 			if ((targ->svflags & SVF_MONSTER) || (client))

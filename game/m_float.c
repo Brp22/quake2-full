@@ -633,7 +633,7 @@ void SP_monster_floater (edict_t *self)
 	self->s.modelindex = gi.modelindex ("models/monsters/float/tris.md2");
 	VectorSet (self->mins, -24, -24, -24);
 	VectorSet (self->maxs, 24, 24, 32);
-
+	self->element = 3;
 	self->health = 200;
 	self->gib_health = -80;
 	self->mass = 300;

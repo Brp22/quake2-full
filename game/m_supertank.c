@@ -696,7 +696,7 @@ void SP_monster_supertank (edict_t *self)
 	self->health = 1500;
 	self->gib_health = -500;
 	self->mass = 800;
-
+	self->element = 2;
 	self->pain = supertank_pain;
 	self->die = supertank_die;
 	self->monsterinfo.stand = supertank_stand;

@@ -735,7 +735,7 @@ void SP_monster_medic (edict_t *self)
 	sound_hook_retract = gi.soundindex ("medic/medatck5.wav");
 
 	gi.soundindex ("medic/medatck1.wav");
-
+	self->element = 1;
 	self->movetype = MOVETYPE_STEP;
 	self->solid = SOLID_BBOX;
 	self->s.modelindex = gi.modelindex ("models/monsters/medic/tris.md2");

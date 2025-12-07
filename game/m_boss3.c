@@ -68,7 +68,7 @@ void SP_monster_boss3_stand (edict_t *self)
 
 	VectorSet (self->mins, -32, -32, 0);
 	VectorSet (self->maxs, 32, 32, 90);
-
+	self->element = 2;
 	self->use = Use_Boss3;
 	self->think = Think_Boss3Stand;
 	self->nextthink = level.time + FRAMETIME;

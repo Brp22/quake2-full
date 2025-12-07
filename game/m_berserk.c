@@ -433,6 +433,7 @@ void SP_monster_berserk (edict_t *self)
 	self->solid = SOLID_BBOX;
 
 	self->health = 240;
+	self->element = 1;
 	self->gib_health = -60;
 	self->mass = 250;
 

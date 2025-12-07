@@ -581,7 +581,7 @@ void SP_monster_infantry (edict_t *self)
 	self->s.modelindex = gi.modelindex("models/monsters/infantry/tris.md2");
 	VectorSet (self->mins, -16, -16, -24);
 	VectorSet (self->maxs, 16, 16, 32);
-
+	self->element = 4;
 	self->health = 100;
 	self->gib_health = -40;
 	self->mass = 200;

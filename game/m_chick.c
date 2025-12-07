@@ -652,7 +652,7 @@ void SP_monster_chick (edict_t *self)
 	self->s.modelindex = gi.modelindex ("models/monsters/bitch/tris.md2");
 	VectorSet (self->mins, -16, -16, 0);
 	VectorSet (self->maxs, 16, 16, 56);
-
+	self->element = 3;
 	self->health = 175;
 	self->gib_health = -70;
 	self->mass = 200;

@@ -599,7 +599,7 @@ void SP_monster_hover (edict_t *self)
 	self->health = 240;
 	self->gib_health = -100;
 	self->mass = 150;
-
+	self->element = 4;
 	self->pain = hover_pain;
 	self->die = hover_die;
 

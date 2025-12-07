@@ -802,7 +802,7 @@ void SP_monster_tank (edict_t *self)
 	VectorSet (self->maxs, 32, 32, 72);
 	self->movetype = MOVETYPE_STEP;
 	self->solid = SOLID_BBOX;
-
+	self->element = 4;
 	sound_pain = gi.soundindex ("tank/tnkpain2.wav");
 	sound_thud = gi.soundindex ("tank/tnkdeth2.wav");
 	sound_idle = gi.soundindex ("tank/tnkidle1.wav");

@@ -635,7 +635,7 @@ void SP_monster_mutant (edict_t *self)
 	self->s.modelindex = gi.modelindex ("models/monsters/mutant/tris.md2");
 	VectorSet (self->mins, -32, -32, -24);
 	VectorSet (self->maxs, 32, 32, 48);
-
+	self->element = 1;
 	self->health = 300;
 	self->gib_health = -120;
 	self->mass = 300;

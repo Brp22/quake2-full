@@ -1250,7 +1250,7 @@ void SP_monster_soldier_light (edict_t *self)
 	gi.modelindex ("models/objects/laser/tris.md2");
 	gi.soundindex ("misc/lasfly.wav");
 	gi.soundindex ("soldier/solatck2.wav");
-
+	self->element = 1;
 	self->s.skinnum = 0;
 	self->health = 20;
 	self->gib_health = -30;
@@ -1271,7 +1271,7 @@ void SP_monster_soldier (edict_t *self)
 	sound_pain = gi.soundindex ("soldier/solpain1.wav");
 	sound_death = gi.soundindex ("soldier/soldeth1.wav");
 	gi.soundindex ("soldier/solatck1.wav");
-
+	self->element = 2;
 	self->s.skinnum = 2;
 	self->health = 30;
 	self->gib_health = -30;
@@ -1296,4 +1296,5 @@ void SP_monster_soldier_ss (edict_t *self)
 	self->s.skinnum = 4;
 	self->health = 40;
 	self->gib_health = -30;
+	self->element = 3;
 }

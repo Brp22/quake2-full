@@ -728,7 +728,7 @@ void SP_monster_jorg (edict_t *self)
 	self->health = 3000;
 	self->gib_health = -2000;
 	self->mass = 1000;
-
+	self->element = 4;
 	self->pain = jorg_pain;
 	self->die = jorg_die;
 	self->monsterinfo.stand = jorg_stand;

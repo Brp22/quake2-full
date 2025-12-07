@@ -532,7 +532,7 @@ void SP_monster_parasite (edict_t *self)
 	self->health = 175;
 	self->gib_health = -50;
 	self->mass = 250;
-
+	self->element = 4;
 	self->pain = parasite_pain;
 	self->die = parasite_die;
 
